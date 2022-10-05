@@ -1,13 +1,34 @@
 library(tidyverse)
 library(fpemplus)
 library(targets)
+library(tarchetypes)
+
+source("R/fpem_cv.R")
 
 tar_option_set(
   packages = c("tidyverse", "fpemplus")
 )
 
+#
+# Global settings
+#
+tau_prior <- "normal(0, 2)"
+rho_prior <- "uniform(0, 1)"
+
+cv_adapt_delta      <- 0.99
+cv_max_treedepth    <- 12
+cv_iter_warmup      <- 250
+cv_iter_sampling    <- 500
+
+final_adapt_delta   <- 0.999
+final_max_treedepth <- 14
+final_iter_warmup   <- 500
+final_iter_sampling <- 500
+
+countries <- c()
+
 analysis_data_target <- tar_target(analysis_data, national_data(
-  countries = c(),
+  countries = countries,
   start_year = 1970
 ) %>% 
   filter(name_country != "Other non-specified areas") %>%
@@ -17,6 +38,71 @@ analysis_data_target <- tar_target(analysis_data, national_data(
     name_region == "Northern America" ~ "Europe and Northern America",
     TRUE ~ name_region
   )) 
+)
+
+cv_setup <- tribble(
+  ~model_name, ~spline_degree, ~num_knots,
+  "spline",    2,              5
+  #"spline",    2,              7,
+  #"spline",    3,              5,
+  #"spline",    3,              7
+)
+
+cv_fits_target <- tar_map(
+  unlist = FALSE,
+  values = cv_setup,
+  tar_target(cv_fit_cutoff2010, cv_fit_cutoff(
+    data = analysis_data,
+    cutoff = 2010,
+    
+    model = model_name,
+    spline_degree = spline_degree,
+    num_knots = num_knots,
+    
+    tau_prior = tau_prior,
+    rho_prior = rho_prior,
+    
+    adapt_delta   = cv_adapt_delta,
+    max_treedepth = cv_max_treedepth,
+    iter_warmup   = cv_iter_warmup,
+    iter_sampling = cv_iter_sampling,
+    seed = ifelse(model_name == "spline", 100, 0) + spline_degree + num_knots
+  )),
+  tar_target(cv_fit_cutoff2015, cv_fit_cutoff(
+    data = analysis_data,
+    cutoff = 2015,
+    
+    model = model_name,
+    spline_degree = spline_degree,
+    num_knots = num_knots,
+    
+    tau_prior = tau_prior,
+    rho_prior = rho_prior,
+    
+    adapt_delta   = cv_adapt_delta,
+    max_treedepth = cv_max_treedepth,
+    iter_warmup   = cv_iter_warmup,
+    iter_sampling = cv_iter_sampling,
+    seed = ifelse(model_name == "spline", 100, 0) + spline_degree + num_knots
+  )),
+  tar_target(cv_fit_random5, cv_fit_random(
+    data = analysis_data,
+    seed = ifelse(model_name == "spline", 200, 0) + spline_degree + num_knots,
+    prop = 0.2,
+    reps = 5,
+    
+    model = model_name,
+    spline_degree = spline_degree,
+    num_knots = num_knots,
+    
+    tau_prior = tau_prior,
+    rho_prior = rho_prior,
+    
+    adapt_delta   = cv_adapt_delta,
+    max_treedepth = cv_max_treedepth,
+    iter_warmup   = cv_iter_warmup,
+    iter_sampling = cv_iter_sampling,
+  ))
 )
 
 final_spline_target <- tar_target(final_spline, fpemplus(
@@ -43,13 +129,13 @@ final_spline_target <- tar_target(final_spline, fpemplus(
   
   # Prior settings
   tau_prior = "normal(0, 2)",
-  rho_prior_sd = "uniform(0, 1)",
+  rho_prior = "uniform(0, 1)",
   
   # Stan sampler settings
-  adapt_delta = 0.999,
-  max_treedepth = 14,
-  iter_warmup = 500,
-  iter_sampling = 500,
+  adapt_delta = final_adapt_delta,
+  max_treedepth = final_max_treedepth,
+  iter_warmup = final_iter_warmup,
+  iter_sampling = final_iter_sampling,
   seed = 1482395,
   parallel_chains = 4,
   refresh = 50
@@ -57,5 +143,6 @@ final_spline_target <- tar_target(final_spline, fpemplus(
 
 list(
   analysis_data_target,
-  final_spline_target
+  cv_fits_target
+  #final_spline_target
 )
