@@ -42,8 +42,8 @@ final_spline_target <- tar_target(final_spline, fpemplus(
   hierarchical_asymptote = c("intercept", "name_region", "name_sub_region", "name_country"),
   
   # Prior settings
-  tau_prior_sd = 10,
-  rho_prior_sd = 2,
+  tau_prior = "normal(0, 2)",
+  rho_prior_sd = "uniform(0, 1)",
   
   # Stan sampler settings
   adapt_delta = 0.999,
