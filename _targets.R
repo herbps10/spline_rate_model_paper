@@ -2,8 +2,11 @@ library(tidyverse)
 library(fpemplus)
 library(targets)
 library(tarchetypes)
+library(future)
 
 source("R/fpem_cv.R")
+
+plan(multicore)
 
 tar_option_set(
   packages = c("tidyverse", "fpemplus")
@@ -25,6 +28,8 @@ final_max_treedepth <- 14
 final_iter_warmup   <- 500
 final_iter_sampling <- 500
 
+output_dir <- "/work/hsusmann_umass_edu/spline_rate_model_paper/output/"
+
 countries <- c()
 
 analysis_data_target <- tar_target(analysis_data, national_data(
@@ -42,10 +47,10 @@ analysis_data_target <- tar_target(analysis_data, national_data(
 
 cv_setup <- tribble(
   ~model_name, ~spline_degree, ~num_knots,
-  "spline",    2,              5
-  #"spline",    2,              7,
-  #"spline",    3,              5,
-  #"spline",    3,              7
+  "spline",    2,              5,
+  "spline",    2,              7,
+  "spline",    3,              5,
+  "spline",    3,              7
 )
 
 cv_fits_target <- tar_map(
@@ -83,26 +88,27 @@ cv_fits_target <- tar_map(
     max_treedepth = cv_max_treedepth,
     iter_warmup   = cv_iter_warmup,
     iter_sampling = cv_iter_sampling,
+		output_dir = output_dir,
     seed = ifelse(model_name == "spline", 100, 0) + spline_degree + num_knots
-  )),
-  tar_target(cv_fit_random5, cv_fit_random(
-    data = analysis_data,
-    seed = ifelse(model_name == "spline", 200, 0) + spline_degree + num_knots,
-    prop = 0.2,
-    reps = 5,
-    
-    model = model_name,
-    spline_degree = spline_degree,
-    num_knots = num_knots,
-    
-    tau_prior = tau_prior,
-    rho_prior = rho_prior,
-    
-    adapt_delta   = cv_adapt_delta,
-    max_treedepth = cv_max_treedepth,
-    iter_warmup   = cv_iter_warmup,
-    iter_sampling = cv_iter_sampling,
   ))
+  #tar_target(cv_fit_random5, cv_fit_random(
+  #  data = analysis_data,
+  #  seed = ifelse(model_name == "spline", 200, 0) + spline_degree + num_knots,
+  #  prop = 0.2,
+  #  reps = 5,
+  #  
+  #  model = model_name,
+  #  spline_degree = spline_degree,
+  #  num_knots = num_knots,
+  #  
+  #  tau_prior = tau_prior,
+  #  rho_prior = rho_prior,
+  #  
+  #  adapt_delta   = cv_adapt_delta,
+  #  max_treedepth = cv_max_treedepth,
+  #  iter_warmup   = cv_iter_warmup,
+  #  iter_sampling = cv_iter_sampling,
+  #))
 )
 
 final_spline_target <- tar_target(final_spline, fpemplus(
@@ -136,6 +142,7 @@ final_spline_target <- tar_target(final_spline, fpemplus(
   max_treedepth = final_max_treedepth,
   iter_warmup = final_iter_warmup,
   iter_sampling = final_iter_sampling,
+	output_dir = output_dir,
   seed = 1482395,
   parallel_chains = 4,
   refresh = 50
