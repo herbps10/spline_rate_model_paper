@@ -3,46 +3,66 @@ library(fpemplus)
 library(targets)
 library(tarchetypes)
 library(future)
+library(cmdstanr)
 
+source("R/national_data_total_use.R")
 source("R/fpem_cv.R")
 
 plan(multicore)
 
 tar_option_set(
-  packages = c("tidyverse", "fpemplus")
+  packages = c("tidyverse", "fpemplus", "cmdstanr")
 )
 
 #
 # Global settings
 #
+countries <- c()
+
 tau_prior <- "normal(0, 2)"
 rho_prior <- "uniform(0, 1)"
 
-cv_adapt_delta      <- 0.99
-cv_max_treedepth    <- 12
+cv_adapt_delta      <- 0.999
+cv_max_treedepth    <- 15
 cv_iter_warmup      <- 250
 cv_iter_sampling    <- 500
+
+#cv_adapt_delta      <- 0.95
+#cv_max_treedepth    <- 8
+#cv_iter_warmup      <- 250
+#cv_iter_sampling    <- 500
 
 #print("TESTING MODE")
 #cv_adapt_delta      <- 0.95
 #cv_max_treedepth    <- 8
 #cv_iter_warmup      <- 250
 #cv_iter_sampling    <- 250
-
+#countries <- c("Somalia", "India", "Palau", "Bangladesh", "Zimbabwe",
+#             "Indonesia", "Kenya", "Turkey", "Mexico", "Guatemala")
 
 final_adapt_delta   <- 0.999
 final_max_treedepth <- 14
 final_iter_warmup   <- 500
-final_iter_sampling <- 500
+final_iter_sampling <- 750
 
 output_dir <- "/work/hsusmann_umass_edu/spline_rate_model_paper/output/"
 #output_dir <- "d:/spline_rate_model_paper/output"
 
-countries <- c()
-#countries <- c("Somalia", "India", "Palau", "Bangladesh", "Zimbabwe",
-#             "Indonesia", "Kenya", "Turkey", "Mexico", "Guatemala")
 
 analysis_data_target <- tar_target(analysis_data, national_data(
+  countries = countries,
+  start_year = 1970
+) %>% 
+  filter(name_country != "Other non-specified areas") %>%
+  filter(modern_method_bias == "None", has_geographical_region_bias == "N") %>%
+  mutate(name_region = case_when(
+    name_region == "Europe" ~ "Europe and Northern America",
+    name_region == "Northern America" ~ "Europe and Northern America",
+    TRUE ~ name_region
+  )) 
+)
+
+analysis_data_total_use_target <- tar_target(analysis_data_total_use, national_data_total_use(
   countries = countries,
   start_year = 1970
 ) %>% 
@@ -77,7 +97,9 @@ cv_fits_target <- tar_map(
     
     tau_prior = tau_prior,
     rho_prior = rho_prior,
-    
+
+		t_star = 1990,
+   
     adapt_delta   = cv_adapt_delta,
     max_treedepth = cv_max_treedepth,
     iter_warmup   = cv_iter_warmup,
@@ -94,30 +116,44 @@ cv_fits_target <- tar_map(
     
     tau_prior = tau_prior,
     rho_prior = rho_prior,
-    
+
+		t_star = 1990,
+   
     adapt_delta   = cv_adapt_delta,
     max_treedepth = cv_max_treedepth,
     iter_warmup   = cv_iter_warmup,
     iter_sampling = cv_iter_sampling,
 		output_dir = output_dir,
-    seed = ifelse(model == "logistic", 150, 0) + spline_degree + num_knots
-  )),
-  tar_target(cv_fit_random5, cv_fit_random(
+   seed = ifelse(model == "logistic", 150, 0) + spline_degree + num_knots
+  ))
+)
+
+cv_setup_random <- cv_setup %>%
+  mutate(rep = rerun(n(), tibble(rep = 1:5))) %>%
+	unnest(rep)
+
+cv_fits_random_target <- tar_map(
+  unlist = FALSE,
+  values = cv_setup_random,
+	tar_target(cv_fit_holdout, cv_fit_random(
     data = analysis_data,
-    seed = ifelse(model == "logistic", 200, 0) + spline_degree + num_knots,
+    #seed = ifelse(model == "logistic", 200, 0) + spline_degree + num_knots + rep * 34421,
+		seed = rep * 24421,
     prop = 0.2,
-    reps = 2,
     
     spline_degree = spline_degree,
     num_knots = num_knots,
     
     tau_prior = tau_prior,
     rho_prior = rho_prior,
+
+		t_star = 1990,
     
     adapt_delta   = cv_adapt_delta,
     max_treedepth = cv_max_treedepth,
     iter_warmup   = cv_iter_warmup,
     iter_sampling = cv_iter_sampling,
+		output_dir = output_dir
   ))
 )
 
@@ -131,6 +167,8 @@ final_spline_target <- tar_target(final_spline, fpemplus(
   
   start_year = 1970, 
   end_year = 2030, 
+
+	t_star = 1990,
   
   model = "spline",
   
@@ -153,10 +191,12 @@ final_spline_target <- tar_target(final_spline, fpemplus(
   iter_warmup = final_iter_warmup,
   iter_sampling = final_iter_sampling,
 	output_dir = output_dir,
-  seed = 1482395,
+  seed = 7391,
   parallel_chains = 4,
   refresh = 50
 ))
+
+final_spline_summary_target <- tar_target(final_spline_summary, final_spline$samples$summary(NULL, posterior::default_convergence_measures()))
 
 final_logistic_target <- tar_target(final_logistic, fpemplus_logistic(
   analysis_data,
@@ -168,12 +208,13 @@ final_logistic_target <- tar_target(final_logistic, fpemplus_logistic(
   
   start_year = 1970, 
   end_year = 2030, 
+	t_star = 1990,
   
   model = "spline",
   
   # Spline setup
   spline_degree = 2,
-  num_knots = 5,
+  num_knots = 7,
   
   # Hierarchical setup
   hierarchical_level     = c("intercept", "name_region", "name_sub_region", "name_country"), 
@@ -191,13 +232,16 @@ final_logistic_target <- tar_target(final_logistic, fpemplus_logistic(
   iter_warmup = final_iter_warmup,
   iter_sampling = final_iter_sampling,
   output_dir = output_dir,
-  seed = 1482395,
+  seed = 1394,
   parallel_chains = 4,
   refresh = 50
 ))
 
 list(
   analysis_data_target,
-  cv_fits_target
-  #final_spline_target
+  final_spline_target,
+  final_logistic_target,
+
+  cv_fits_target,
+  cv_fits_random_target
 )
