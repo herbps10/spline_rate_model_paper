@@ -55,18 +55,10 @@ cv_fit_cutoff <- function(data, cutoff, logistic = FALSE, ...) {
   cv_fit(data, held_out, logistic = logistic, ...) 
 }
 
-cv_fit_random <- function(data, seed, prop = 0.2, reps = 5, logistic = FALSE, ...) {
+cv_fit_random <- function(data, seed, prop = 0.2, logistic = FALSE, ...) {
   set.seed(seed)
-  tibble(
-    rep = 1:reps
-  ) %>%
-    mutate(held_out = map(rep, function(x) {
-      indices <- sample(1:nrow(data), size = round(nrow(data) * prop))
-      held_out <- rep(FALSE, nrow(data))
-      held_out[indices] <- TRUE
-      held_out
-    })) %>%
-    mutate(cv_fit = map(held_out, function(held_out) {
-      cv_fit(data, held_out, logistic = logistic, ...)
-    }))
+	indices <- sample(1:nrow(data), size = round(nrow(data) * prop))
+	held_out <- rep(FALSE, nrow(data))
+	held_out[indices] <- TRUE
+	cv_fit(data, held_out, logistic = logistic, seed = seed, ...)
 }
