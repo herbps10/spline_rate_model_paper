@@ -37,4 +37,9 @@ eta2030 %>%
   filter(name_country %in% diffs$name_country[1:15]) %>%
   ggplot(aes(x = reorder(name_country, abs_diff), y = `50%`, color = model)) +
   geom_errorbar(aes(ymin = `2.5%`, ymax = `97.5%`), width = 0, position = position_dodge(width = 0.5)) +
-  geom_point(position = position_dodge(width = 0.5))
+  geom_point(position = position_dodge(width = 0.5)) +
+  labs(x = "Country", y = "mCPR in 2030") +
+  my_theme +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.y = element_text(angle = 90))
+
+ggsave("plots/eta_diffs2030.pdf", width = 8, height = 6)

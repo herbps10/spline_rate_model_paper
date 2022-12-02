@@ -14,7 +14,7 @@ my_theme <- cowplot::theme_cowplot() +
 
 p1 <- plot_transition(final_spline, "name_country", areas = "Kenya") +
   guides(fill = "none") +
-  labs(x = expression(eta[ct] / P^u[c]), y = expression(f[b])) +
+  labs(x = expression(eta[ct] / lambda[c]^u), y = expression(f[b])) +
   my_theme
 
 p2 <- plot_smoother(final_spline, areas = "Kenya") +
@@ -31,10 +31,11 @@ p3 <- plot_indicator(final_spline, areas = "Kenya", color_sources = TRUE) +
   my_theme
 
 p3$layers[[5]]$mapping <- aes(ymin = lower, ymax = upper, y = contraceptive_use_modern)
-p3$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = source)
+p3$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = data_series_type)
 p3
 
 p <- (p1 / p2 / p3) + 
+  plot_layout(guides = "collect") &
   plot_annotation(
     title = "Kenya",
     tag_levels = "A", 

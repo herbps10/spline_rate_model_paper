@@ -156,10 +156,10 @@ plot_fpem_transition_function_example <- function(omega, t_star = 40, P = 0.8, O
   
   if(show_P == TRUE) {
     p1 <- p1 + geom_vline(xintercept = P, lty = 2, color = "blue") +
-      annotate(x = P + 0.07, y = 0.075, label = expression(P[c]^u), geom = "text", color = "blue")
+      annotate(x = P + 0.07, y = 0.075, label = expression(lambda[c]^u), geom = "text", color = "blue")
     
     p2 <- p2 + geom_hline(yintercept = P, lty = 2, color = "blue") +
-      annotate(x = 80, y = 0.85, label = expression(P[c]^u), geom = "text", color = "blue")
+      annotate(x = 80, y = 0.85, label = expression(lambda[c]^u), geom = "text", color = "blue")
   }
   
   list(
@@ -211,10 +211,10 @@ plot_transition_function_example <- function(beta, knots = 7, spline_degree = 2,
   
   if(show_P == TRUE) {
     p1 <- p1 + geom_vline(xintercept = P, lty = 2, color = "blue") +
-      annotate(x = P + 0.07, y = 0.075, label = expression(P[c]^u), geom = "text")
+      annotate(x = P + 0.07, y = 0.075, label = expression(lambda[c]^u), geom = "text")
     
     p2 <- p2 + geom_hline(yintercept = P, lty = 2, color = "blue") +
-      annotate(x = 80, y = 0.85, label = expression(P[c]^u), geom = "text", color = "blue")
+      annotate(x = 80, y = 0.85, label = expression(lambda[c]^u), geom = "text", color = "blue")
   }
   
   #ggpubr::ggarrange(p1, p2, ncol = 2)
@@ -240,7 +240,7 @@ plot_splines <- function(knots = 7, spline_degree = 2) {
   ggplot(basis_functions, aes(x, y)) +
     geom_line(aes(group = j)) +
     cowplot::theme_cowplot() +
-    labs(x = expression(eta[ct] / P[c]^u), y = expression(f[b])) +
+    labs(x = expression(eta[ct] / lambda[c]^u), y = expression(f[b])) +
     theme(plot.title = element_text(face = "plain", hjust = 0.5))
 }
 

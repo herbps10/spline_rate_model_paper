@@ -4,6 +4,7 @@ library(fpemplus)
 library(patchwork)
 
 final_spline <- readRDS("server-output/final_spline")
+final_logistic <- readRDS("server-output/final_logistic")
 
 my_theme <- cowplot::theme_cowplot() +
   theme(

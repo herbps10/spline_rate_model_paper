@@ -16,7 +16,7 @@ pdf("plots/spline_results.pdf", width = 15, height = 5)
 for(country in unique(final_spline$data$name_country)) {
   print(country)
   p1 <- plot_transition(final_spline, "name_country", areas = country) +
-    labs(x = expression(eta[ct] / P^u[c]), y = expression(f[b])) +
+    labs(x = expression(eta[ct] / lambda^u[c]), y = expression(f[b])) +
     guides(fill = "none") +
     my_theme
     
@@ -32,7 +32,9 @@ for(country in unique(final_spline$data$name_country)) {
     my_theme
   
   p3$layers[[5]]$mapping <- aes(ymin = lower, ymax = upper, y = contraceptive_use_modern)
-  p3$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = source)
+  p3$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = data_series_type)
+  
+  if(country == "RÈunion") country <- "Réunion"
   
   p <- (p1 + p2 + p3) + 
     plot_annotation(title = country, tag_levels = "A", theme = theme(plot.title = element_text(face = "bold"))) &

@@ -7,8 +7,8 @@ final_spline <- readRDS("server-output/final_spline")
 
 my_theme <- cowplot::theme_cowplot() +
   theme(
-    strip.background = element_blank(),
-    strip.text.x = element_blank(),
+    #strip.background = element_blank(),
+    #strip.text.x = element_blank(),
     axis.title.y = element_text(angle = 0, vjust = 0.5)
   )
 
@@ -31,6 +31,6 @@ ggplot(sub_regions, aes(x = x, y = Y)) +
   scale_color_manual(values = c("#7f8c8d", "#2980b9", "#f39c12")) +
   facet_wrap(~fct_reorder(factor(name_sub_region), name_region)) +
   my_theme +
-  labs(y = expression(f[b]), x = expression(eta[ct]/P^u[c]))
+  labs(y = expression(f[b]), x = expression(eta[ct]/lambda^u[c]))
 
 ggsave("plots/transition_function_hierarchy.pdf", width = 14, height = 10)
