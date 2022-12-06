@@ -1,5 +1,5 @@
 library(tidyverse)
-library(fpemplus)
+library(BayesTransitionModels)
 
 source("R/extract_tfr_data.R")
 
@@ -18,7 +18,7 @@ countries_phase2 <- dat %>%
   distinct(country_name, start_phase3) %>%
   filter(start_phase3 == 14)
 
-dat <- dat %>% filter(country_name %in% countries)
+#dat <- dat %>% filter(country_name %in% countries)
 
 dat %>%
   ggplot(aes(x = period, y = tfr)) +
@@ -115,7 +115,7 @@ plot_hierarchical_sd(fit, "splines")
 compare_transitions <- function(country, overlap = FALSE) {
   country_data <- filter(dat, country_name == country)
   
-  bayestfr_transition <- extract_bayesTFR_transition("D:/spline_rate_model_paper/bayesTFR.output/", country)
+  bayestfr_transition <- extract_bayesTFR_transition("bayesTFR.output/", country)
   bayestfr_transition_summary <- bayestfr_transition %>%
     group_by(x) %>% 
     mutate(decrement = -decrement) %>%
@@ -163,7 +163,7 @@ eta_pred2 <- spread_draws(fit$samples$draws("eta_pred2"), eta_pred2[c,t]) %>%
   left_join(fit$phases)
 
 compare_projections <- function(country, overlap = TRUE) {
-  pred <- get.tfr.prediction("D:/spline_rate_model_paper/bayesTFR.output")
+  pred <- get.tfr.prediction("bayesTFR.output")
   
   proj <- tfr.trajectories.table(pred, country) %>%
     as_tibble(rownames = "period") %>%
@@ -235,7 +235,7 @@ compare_point_estimates <- function(period, label_cutoff = 2.25) {
     select(period, country_name, `50%`) %>%
     rename(spline_median = `50%`)
   
-  pred <- get.tfr.prediction("D:/spline_rate_model_paper/bayesTFR.output")
+  pred <- get.tfr.prediction("bayesTFR.output")
   
   proj <- map(unique(dat$country_name), function(x) {
     tfr.trajectories.table(pred, x) %>% 
@@ -260,16 +260,16 @@ compare_point_estimates <- function(period, label_cutoff = 2.25) {
 
 compare_point_estimates(2048, label_cutoff = 3.5) +
   ggtitle("Comparison 2048", subtitle = "Phase II countries only")
-ggsave("D:/spline_rate_model_paper/plots/point_estimate_comparison_2048.pdf", width = 8, height = 8)
+ggsave("plots/point_estimate_comparison_2048.pdf", width = 8, height = 8)
 
 compare_point_estimates(2098, label_cutoff = 2.25) +
   ggtitle("Comparison 2098", subtitle = "Phase II countries only")
-ggsave("D:/spline_rate_model_paper/plots/point_estimate_comparison_2098.pdf", width = 8, height = 8)
+ggsave("plots/point_estimate_comparison_2098.pdf", width = 8, height = 8)
 
 compare_projections("Rwanda")
 compare_transitions("Rwanda")
 
-pdf("D:/spline_rate_model_paper/plots/bayestfr_splines_comparison_phase2.pdf", width = 18, height = 6)
+pdf("plots/bayestfr_splines_comparison_phase2.pdf", width = 18, height = 6)
 for(country in sort(unique(countries_phase2$country_name))) {
   print(country)
   p1 <- compare_transitions(country)
@@ -289,7 +289,7 @@ p5 <- compare_transitions("Chad", overlap = FALSE) + ggtitle("Chad") + theme(leg
 p6 <- compare_transitions("Niger", overlap = FALSE) + ggtitle("Niger") + theme(legend.position = "none")
 
 (p1 + p2) / (p3 + p4) / (p5 + p6)
-ggsave("D:/spline_rate_model_paper/plots/tfr_transition_examples.pdf", width = 12, height = 10)
+ggsave("plots/tfr_transition_examples.pdf", width = 12, height = 10)
 
 p1 <- compare_projections("Angola") + ggtitle("Angola") + theme(legend.position = "none")
 p2 <- compare_projections("Afghanistan") + ggtitle("Afghanistan")
@@ -299,4 +299,4 @@ p5 <- compare_projections("Chad") + ggtitle("Chad") + theme(legend.position = "n
 p6 <- compare_projections("Niger") + ggtitle("Niger") + theme(legend.position = "none")
 
 (p1 + p2) / (p3 + p4) / (p5 + p6)
-ggsave("D:/spline_rate_model_paper/plots/tfr_projection_examples.pdf", width = 10, height = 10)
+ggsave("plots/tfr_projection_examples.pdf", width = 10, height = 10)
