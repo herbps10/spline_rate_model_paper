@@ -1,4 +1,3 @@
-library(tidyverse)
 library(targets)
 
 analyze_fit <- function(fit, only_most_recent = FALSE) {
@@ -85,50 +84,50 @@ analyze_fit <- function(fit, only_most_recent = FALSE) {
 	results
 }
 
-#tar_load(starts_with("cv_fit_cutoff2010"))
-#tab2010 <- tribble(
-#	~title, ~fit,
-#	"B-spline ($d=2$, $K=5$)", cv_fit_cutoff2010_spline_2_5,
-#	"B-spline ($d=2$, $K=7$)", cv_fit_cutoff2010_spline_2_7,
-#	"B-spline ($d=3$, $K=5$)", cv_fit_cutoff2010_spline_3_5,
-#	"B-spline ($d=2$, $K=7$)", cv_fit_cutoff2010_spline_3_7,
-#	"Logistic", cv_fit_cutoff2010_logistic_2_7
-#) %>%
-#	mutate(results = map(fit, analyze_fit, only_most_recent = TRUE)) %>%
-#	select(-fit) %>%
-#	unnest(results)
-#
-#tab2010_a <- tab2010 %>%
-#  select(title, below, within, above, ci_width, median_error, median_abs_error) %>%
-#	mutate_if(is.numeric, ~signif(. * 100, 3)) %>%
-#	mutate_at(vars(below, within, above), ~paste0(., "\\%"))
-#
-#tab2010_b <- tab2010 %>%
-#  select(title, below_q5, below_q10, below_q25, below_q50, above_q50, above_q75, above_q90, above_q95) %>%
-#	mutate_if(is.numeric, ~paste0(signif(. * 100, 3), "\\%"))
-#
-##tar_load(starts_with("cv_fit_cutoff2015"))
-#tab2015 <- tribble(
-#	~title, ~fit,
-#	"B-spline ($d=2$, $K=5$)", cv_fit_cutoff2015_spline_2_5,
-#	"B-spline ($d=2$, $K=7$)", cv_fit_cutoff2015_spline_2_7,
-#	"B-spline ($d=3$, $K=5$)", cv_fit_cutoff2015_spline_3_5,
-#	"B-spline ($d=2$, $K=7$)", cv_fit_cutoff2015_spline_3_7,
-#	"Logistic", cv_fit_cutoff2015_logistic_2_7
-#) %>%
-#	mutate(results = map(fit, analyze_fit, only_most_recent = TRUE)) %>%
-#	select(-fit) %>%
-#	unnest(results)
-#
-#tab2015_a <- tab2015 %>%
-#  select(title, below, within, above, ci_width, median_error, median_abs_error) %>%
-#	mutate_if(is.numeric, ~signif(. * 100, 3)) %>%
-#	mutate_at(vars(below, within, above), ~paste0(., "\\%"))
-#
-#tab2015_b <- tab2015 %>%
-#  select(title, below_q5, below_q10, below_q25, below_q50, above_q50, above_q75, above_q90, above_q95) %>%
-#	mutate_if(is.numeric, ~paste0(signif(. * 100, 3), "\\%"))
-#
+tar_load(starts_with("cv_fit_cutoff2010"))
+tab2010 <- tribble(
+	~title, ~fit,
+	"B-spline ($d=2$, $K=5$)", cv_fit_cutoff2010_spline_2_5,
+	"B-spline ($d=2$, $K=7$)", cv_fit_cutoff2010_spline_2_7,
+	"B-spline ($d=3$, $K=5$)", cv_fit_cutoff2010_spline_3_5,
+	"B-spline ($d=2$, $K=7$)", cv_fit_cutoff2010_spline_3_7,
+	"Logistic", cv_fit_cutoff2010_logistic_2_7
+) %>%
+	mutate(results = map(fit, analyze_fit, only_most_recent = TRUE)) %>%
+	select(-fit) %>%
+	unnest(results)
+
+tab2010_a <- tab2010 %>%
+  select(title, below, within, above, ci_width, median_error, median_abs_error) %>%
+	mutate_if(is.numeric, ~signif(. * 100, 3)) %>%
+	mutate_at(vars(below, within, above), ~paste0(., "\\%"))
+
+tab2010_b <- tab2010 %>%
+  select(title, below_q5, below_q10, below_q25, below_q50, above_q50, above_q75, above_q90, above_q95) %>%
+	mutate_if(is.numeric, ~paste0(signif(. * 100, 3), "\\%"))
+
+#tar_load(starts_with("cv_fit_cutoff2015"))
+tab2015 <- tribble(
+	~title, ~fit,
+	"B-spline ($d=2$, $K=5$)", cv_fit_cutoff2015_spline_2_5,
+	"B-spline ($d=2$, $K=7$)", cv_fit_cutoff2015_spline_2_7,
+	"B-spline ($d=3$, $K=5$)", cv_fit_cutoff2015_spline_3_5,
+	"B-spline ($d=2$, $K=7$)", cv_fit_cutoff2015_spline_3_7,
+	"Logistic", cv_fit_cutoff2015_logistic_2_7
+) %>%
+	mutate(results = map(fit, analyze_fit, only_most_recent = TRUE)) %>%
+	select(-fit) %>%
+	unnest(results)
+
+tab2015_a <- tab2015 %>%
+  select(title, below, within, above, ci_width, median_error, median_abs_error) %>%
+	mutate_if(is.numeric, ~signif(. * 100, 3)) %>%
+	mutate_at(vars(below, within, above), ~paste0(., "\\%"))
+
+tab2015_b <- tab2015 %>%
+  select(title, below_q5, below_q10, below_q25, below_q50, above_q50, above_q75, above_q90, above_q95) %>%
+	mutate_if(is.numeric, ~paste0(signif(. * 100, 3), "\\%"))
+
 
 print("Loading random hold-out runs...")
 tar_load(starts_with("cv_fit_holdout_spline_2_5"))
@@ -185,4 +184,3 @@ tab_random_a <- tab_random %>%
 tab_random_b <- tab_random %>%
   select(title, below_q5, below_q10, below_q25, below_q50, above_q50, above_q75, above_q90, above_q95) %>%
 	mutate_if(is.numeric, ~paste0(signif(. * 100, 3), "\\%"))
-
