@@ -1,5 +1,5 @@
 library(tidyverse)
-library(fpemplus)
+library(BayesTransitionModels)
 library(targets)
 library(tarchetypes)
 library(future)
@@ -11,7 +11,7 @@ source("R/fpem_cv.R")
 plan(multicore)
 
 tar_option_set(
-  packages = c("tidyverse", "fpemplus", "cmdstanr")
+  packages = c("tidyverse", "BayesTransitionModels", "cmdstanr")
 )
 
 #

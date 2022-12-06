@@ -1,6 +1,6 @@
 library(tidyverse)
+library(BayesTransitionModels)
 library(targets)
-library(fpemplus)
 library(patchwork)
 
 final_spline <- readRDS("server-output/final_spline")

@@ -1,6 +1,6 @@
 library(tidyverse)
 library(targets)
-library(fpemplus)
+library(BayesTransitionModels)
 library(patchwork)
 library(tidybayes)
 
