@@ -2,7 +2,7 @@
 
 Code for "Flexible Modeling of Transition Processes with B-Splines", Susmann & Alkema (Forthcoming).
 
-To run the main models:
+To run the main mCPR models:
 ```
 library(targets)
 tar_make()
@@ -19,5 +19,7 @@ Code to generate plots and tables can be found in the `R/figures` and
 and spline fits can be found in `server-output/final_spline` and
 `server-output/final_logistic`, respectively, which may require copying from
 the `targets` output folder.
+
+The main code for running the TFR case study can be found in `R/wpp.R`.
 
 This work was supported, in whole or in part, by the Bill & Melinda Gates Foundation (INV-00844).
