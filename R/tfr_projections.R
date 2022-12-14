@@ -1,12 +1,16 @@
+# Install modified bayesTFR from Github that allows
+# disabling phase-3 estimation
+#
 # remotes::install_github("herbps10/bayesTFR")
+
 library(bayesTFR)
 
-mc <- run.tfr.mcmc(output.dir = "D:/spline_rate_model_paper/bayesTFR.output", iter = 8e3, nr.chains = 2, replace = TRUE)
-mc <- get.tfr.mcmc(sim.dir = "D:/spline_rate_model_paper/bayesTFR.output")
+mc <- run.tfr.mcmc(output.dir = "bayesTFR.output", iter = 8e3, nr.chains = 2, replace = TRUE)
+mc <- get.tfr.mcmc(sim.dir = "bayesTFR.output")
 
 pred <- tfr.predict(
   mc, 
-  output.dir = "D:/spline_rate_model_paper/bayesTFR.output_test", 
+  output.dir = "bayesTFR.output", 
   replace.output = TRUE,
   use.tfr3 = FALSE,
   mu = 0,
