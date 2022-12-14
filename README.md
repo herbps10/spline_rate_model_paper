@@ -1,6 +1,8 @@
 # B-spline Transition Models
 
-Code for "Flexible Modeling of Transition Processes with B-Splines", Susmann & Alkema (Forthcoming).
+Code for "Flexible Modeling of Transition Processes with B-Splines" by Herbert Susmann & Leontine Alkema.
+
+The principal dependency of this code is the `BayesTransitionModels` R package.
 
 To run the main models:
 ```
