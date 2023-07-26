@@ -8,7 +8,8 @@ library(cmdstanr)
 source("R/national_data_total_use.R")
 source("R/fpem_cv.R")
 
-plan(multicore)
+#plan(multicore)
+plan(multisession)
 
 tar_option_set(
   packages = c("tidyverse", "BayesTransitionModels", "cmdstanr")
@@ -39,13 +40,17 @@ cv_iter_sampling    <- 500
 #cv_iter_sampling    <- 250
 #countries <- c("Somalia", "India", "Palau", "Bangladesh", "Zimbabwe",
 #             "Indonesia", "Kenya", "Turkey", "Mexico", "Guatemala")
+#final_adapt_delta = 0.95
+#final_max_treedepth = 8
+#final_iter_warmup <- 50
+#final_iter_sampling <- 50
 
 final_adapt_delta   <- 0.999
 final_max_treedepth <- 14
 final_iter_warmup   <- 500
 final_iter_sampling <- 750
 
-output_dir <- "/work/hsusmann_umass_edu/spline_rate_model_paper/output/"
+output_dir <- "/work/pi_lalkema_umass_edu/herb/spline_rate_model_paper/output"
 #output_dir <- "d:/spline_rate_model_paper/output"
 
 
@@ -191,10 +196,53 @@ final_spline_target <- tar_target(final_spline, fpemplus(
   iter_warmup = final_iter_warmup,
   iter_sampling = final_iter_sampling,
 	output_dir = output_dir,
-  seed = 7391,
+  #seed = 7391,
+  seed = 7395,
   parallel_chains = 4,
   refresh = 50
 ))
+
+final_spline_target_nosmooth <- tar_target(final_spline_nosmooth, fpemplus(
+  analysis_data,
+  y = "contraceptive_use_modern",
+  se = "se_modern",
+  year = "year",
+  source = "data_series_type",
+  area = "name_country",
+  
+  start_year = 1970, 
+  end_year = 2030, 
+
+	t_star = 1990,
+  
+  model = "spline",
+  
+  # Spline setup
+  spline_degree = 2,
+  num_knots = 5,
+	smoothing = FALSE,
+  
+  # Hierarchical setup
+  hierarchical_level     = c("intercept", "name_region", "name_sub_region", "name_country"), 
+  hierarchical_splines   = c("intercept", "name_region", "name_sub_region", "name_country"),
+  hierarchical_asymptote = c("intercept", "name_country"),
+  
+  # Prior settings
+  tau_prior = "normal(0, 2)",
+  rho_prior = "uniform(0, 1)",
+  
+  # Stan sampler settings
+  adapt_delta = final_adapt_delta,
+  max_treedepth = final_max_treedepth,
+  iter_warmup = final_iter_warmup,
+  iter_sampling = final_iter_sampling,
+	output_dir = output_dir,
+  #seed = 7391,
+  seed = 7394,
+  parallel_chains = 4,
+  refresh = 50
+))
+
 
 final_spline_summary_target <- tar_target(final_spline_summary, final_spline$samples$summary(NULL, posterior::default_convergence_measures()))
 
@@ -232,7 +280,8 @@ final_logistic_target <- tar_target(final_logistic, fpemplus_logistic(
   iter_warmup = final_iter_warmup,
   iter_sampling = final_iter_sampling,
   output_dir = output_dir,
-  seed = 1394,
+  #seed = 1394,
+  seed = 1396,
   parallel_chains = 4,
   refresh = 50
 ))
