@@ -27,7 +27,7 @@ p <- plot_indicator(final_spline, c("Bangladesh", "Indonesia", "Kenya",
         axis.line = element_line())
 
 p$layers[[5]]$mapping <- aes(ymin = lower, ymax = upper, y = contraceptive_use_modern)
-p$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = source)
+p$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = data_series_type)
 p$facet$params$free$x <- TRUE
 p$facet$params$free$y <- TRUE
   
@@ -50,7 +50,7 @@ p <- plot_indicator(final_logistic, c("Bangladesh", "Indonesia", "Kenya",
         axis.line = element_line())
 
 p$layers[[5]]$mapping <- aes(ymin = lower, ymax = upper, y = contraceptive_use_modern)
-p$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = source)
+p$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = data_series_type)
 p$facet$params$free$x <- TRUE
 p$facet$params$free$y <- TRUE
   

@@ -286,4 +286,4 @@ ggsave("plots/spline_logistic_transition_function_example.pdf", height = 4)
 
 
 plot_tfr_transition_function_example(1.2, 1, 2, 2, 2)$plot
-ggsave("plots/tfr_transition_function_example.pdf", height = 5)
+ggsave("plots/tfr_transition_function_example.pdf", height = 4)

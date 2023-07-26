@@ -20,7 +20,7 @@ area <- "Rwanda"
 #
 p1 <- plot_transition(final_logistic, "name_country", areas = area) +
   guides(fill = "none") +
-  ylim(c(0, 0.25)) +
+  ylim(c(0, 0.35)) +
   labs(x = expression(eta[ct] / lambda[c]^u), y = expression(f[b])) +
   my_theme +
   ggtitle("", subtitle = "Logistic")
@@ -51,7 +51,7 @@ p3$layers[[6]]$mapping <- aes(y = contraceptive_use_modern, shape = data_series_
 #
 p4 <- plot_transition(final_spline, "name_country", areas = area) +
   guides(fill = "none") +
-  ylim(c(0, 0.25)) +
+  ylim(c(0, 0.35)) +
   labs(x = expression(eta[ct] / lambda[c]^u), y = expression(f[b])) +
   my_theme +
   ggtitle("", subtitle = "B-spline (d=2, K=5)")
