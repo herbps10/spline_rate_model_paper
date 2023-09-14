@@ -48,7 +48,7 @@ cv_iter_sampling    <- 500
 final_adapt_delta   <- 0.999
 final_max_treedepth <- 14
 final_iter_warmup   <- 500
-final_iter_sampling <- 750
+final_iter_sampling <- 1500
 
 output_dir <- "/work/pi_lalkema_umass_edu/herb/spline_rate_model_paper/output"
 #output_dir <- "d:/spline_rate_model_paper/output"
