@@ -107,7 +107,7 @@ plot_tfr_transition_function_example <- function(d, delta1, delta2, delta3, delt
     #geom_segment(x = t_star, xend = t_star, y = -1, yend = Omega, lty = 2, color = "blue") +
     #annotate(x = t_star + 5, y = Omega, label = expression(Omega[c]), geom = "text", color = "blue") +
     cowplot::theme_cowplot() +
-    labs(x = expression(t), y = expression(eta[ct]), title = "TFR") +
+    labs(x = expression(t), y = expression(eta[ct]), title = "Latent Indicator Value") +
     theme(legend.position = "none", plot.title = element_text(face = "italic"))
   
   
@@ -141,7 +141,7 @@ plot_fpem_transition_function_example <- function(omega, t_star = 40, P = 0.8, O
     # f curve
     geom_line() +
     
-    labs(x = expression(eta[ct]), y = expression(f[FPEM]), title = "Transition Function") +
+    labs(x = expression(eta[ct]), y = expression(f[l]), title = "Transition Function") +
     cowplot::theme_cowplot() +
     theme(legend.position = "none", plot.title = element_text(face = "italic"))
   
@@ -150,7 +150,7 @@ plot_fpem_transition_function_example <- function(omega, t_star = 40, P = 0.8, O
     geom_segment(x = t_star, xend = t_star, y = -1, yend = Omega, lty = 2, color = "blue") +
     annotate(x = t_star + 5, y = Omega, label = expression(Omega[c]), geom = "text", color = "blue") +
     cowplot::theme_cowplot() +
-    labs(x = expression(t), y = expression(eta[ct]), title = "mCPR") +
+    labs(x = expression(t), y = expression(eta[ct]), title = "Latent Indicator Value") +
     theme(legend.position = "none", plot.title = element_text(face = "italic"))
   
   
@@ -205,7 +205,7 @@ plot_transition_function_example <- function(beta, knots = 7, spline_degree = 2,
     geom_segment(x = t_star, xend = t_star, y = -1, yend = Omega, lty = 2, color = "blue") +
     annotate(x = t_star + 5, y = Omega, label = expression(Omega[c]), geom = "text", color = "blue") +
     cowplot::theme_cowplot() +
-    labs(x = expression(t), y = expression(eta[ct]), title = "CPR") +
+    labs(x = expression(t), y = expression(eta[ct]), title = "Latent Indicator Value") +
     theme(legend.position = "none", plot.title = element_text(face = "italic"))
   
   

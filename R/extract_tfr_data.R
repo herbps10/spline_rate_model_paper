@@ -19,6 +19,24 @@ extract_bayesTFR_transition <- function(sim.dir, country) {
   dec
 }
 
+extract_bayesTFR_projection <- function(sim.dir, country) {
+  mcmc <- get.tfr.mcmc(sim.dir)
+  mcmc.list <- get.mcmc.list(mcmc)
+  meta <- mcmc.list[[1]]$meta
+  country <- get.country.object(country, meta)
+  xs <- seq(0, 10, 0.1)
+  dlcurves <- tfr.get.dlcurves(xs, mcmc.list, country$code, country$index, 0, NULL, FALSE)
+  
+  bayesTFR:::get.observed.tfr(country$index, meta, "tfr_matrix_observed", 
+                              "tfr_matrix_all")[1:meta$T_end_c[country$index]]
+  
+  dec <- as_tibble(t(dlcurves)) %>%
+    mutate(x = xs) %>%
+    pivot_longer(starts_with("V"), names_prefix = "V", names_to = "draw", values_to = "decrement", names_transform = as.numeric)
+  
+  dec
+}
+
 tfr_dataset <- function() {
   # following the example code of run mcmc to get the meta associated with default wpp2019 run
   sim.dir <- file.path(find.package("bayesTFR"), "ex-data", "bayesTFR.output")
